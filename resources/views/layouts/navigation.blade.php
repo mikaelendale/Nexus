@@ -11,9 +11,15 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"> 
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                        {{ __('Attendance') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('detail')" :active="request()->routeIs('detail')">
+                        {{ __('Details') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('add')" :active="request()->routeIs('add')">
+                        {{ __('Add Section') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -68,8 +74,15 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                {{ __('Attendance') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('detail')" :active="request()->routeIs('detail')">
+                {{ __('Detail') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('add')" :active="request()->routeIs('add')">
+                {{ __('Add Section') }}
+            </x-responsive-nav-link>
+
         </div>
 
         <!-- Responsive Settings Options -->
