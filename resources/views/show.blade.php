@@ -61,8 +61,8 @@
                                         <option value="friday">Friday</option>
                                         <option value="saturday">Saturday</option>
                                         <option value="sunday">Sunday</option>
-                                    </select>
-                                </div>
+                               </div>          </select>
+
 
                                 <div class="mt-4">
                                     <label for="hours"
@@ -75,7 +75,7 @@
                                 <div class="mt-4 flex justify-end">
                                     <button type="submit"
                                         class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Submit</button>
-                                </div>
+                                </div><br>
                             </form>
 
                             <!-- Progress Bar Calculation -->
@@ -83,7 +83,6 @@
                                 $totalHours = $volunteer->total ?? 0;
                                 $percentage = ($totalHours / 72) * 100;
                             @endphp
-
                             <!-- Progress Bar -->
                             <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
                                 <div class="h-4 rounded-full"

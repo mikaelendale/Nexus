@@ -4,11 +4,17 @@
             {{ __('Attendance') }}
         </h2>
     </x-slot>
-
+    @if (session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">Success!</strong>
+            <span class="block sm:inline">{{ session('success') }}</span> 
+        </div>
+    @endif
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-dark dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
+
                     <div class="pb-5 sm:flex sm:items-center sm:justify-between">
                         <h3 class="text-lg leading-6 font-medium text-gray-100">Volunteer List</h3>
                         <div class="mt-3 sm:mt-0 sm:ml-4">
@@ -80,7 +86,13 @@
                                                     <td
                                                         class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                         <a href="{{ route('dashboard.show', $volunteer->id) }}"
-                                                            class="text-indigo-600 hover:text-indigo-900">Check</a>
+                                                            class="text-green-600 hover:text-green-700">Check</a>
+                                                    </td>
+                                                    <td
+                                                        class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                        <a href="{{ route('dashboard.edit', $volunteer->id) }}"
+                                                            class="text-yellow-600 hover:text-red-600">Edit
+                                                            Volunteer</a>
                                                     </td>
                                                 </tr>
                                             @endforeach

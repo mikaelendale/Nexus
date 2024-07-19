@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Volunteers;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
+    
     public function index(Request $request)
     {
         $search = $request->input('search');
@@ -73,16 +75,75 @@ class PageController extends Controller
         return redirect()->back()->with('success', $message);
     }
 
+    public function edit($id)
+    {
+        $volunteer = Volunteers::findOrFail($id);
+        return view('edit', compact('volunteer'));
+    }
+
+    // Update the volunteer
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'project_title' => 'nullable|string|max:255',
+            'project_description' => 'nullable|string',
+        ]);
+
+        $volunteer = Volunteers::findOrFail($id);
+        $volunteer->name = $request->name;
+        $volunteer->project_title = $request->project_title;
+        $volunteer->project_description = $request->project_description;
+        $volunteer->save();
+
+        return redirect()->route('dashboard', $volunteer->id)
+                         ->with('success', 'Volunteer updated successfully.');
+    }
+
+    // Delete the volunteer
+    public function destroy($id)
+    {
+        $volunteer = Volunteers::findOrFail($id);
+        $volunteer->delete();
+
+        return redirect()->route('volunteers.index')
+                         ->with('success', 'Volunteer deleted successfully.');
+    }
+
     public function showDetails()
     {
         // Fetch students with pagination (adjust as needed)
         $volunteers = Volunteers::orderBy('total', 'desc')->take(9)->get();
 
     return view('details', compact('volunteers'));
-    } 
+    }  
     public function add()
     {
-        return view('add');
+        $totalVolunteers = Volunteers::count();
+        $totalAdmins = User::count(); // Adjust 'user_type' as per your database schema
+
+        return view('add', [
+            'totalVolunteers' => $totalVolunteers,
+            'totalAdmins' => $totalAdmins,
+        ]);
+    }
+    public function add_volunteers()
+    {
+        return view('add_volunteers');
+    }
+     public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        // Create a new volunteer with the name and auto-increment volunteer_id
+        $volunteer = Volunteers::create([
+            'name' => $request->name,
+            'volunteer_id' => Volunteers::max('id') + 1, // Assuming `id` is the auto-incrementing primary key
+        ]);
+
+        return redirect()->route('add')->with('success', 'Volunteer added successfully.')->with('volunteer', $volunteer);
     }
 
 }

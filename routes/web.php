@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -26,7 +27,12 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [PageController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/{id}', [PageController::class, 'show'])->name('dashboard.show');
+    Route::get('/dashboard/{id}/edit', [PageController::class, 'edit'])->name('dashboard.edit');
+    Route::put('/dashboard/{id}', [PageController::class, 'update'])->name('dashboard.update');
+    Route::delete('/dashboard/{id}', [PageController::class, 'destroy'])->name('dashboard.destroy');
     Route::post('/update-hours', [PageController::class, 'updateHours'])->name('update.hours');
+    Route::get('/add/volunteers', [PageController::class, 'add_volunteers'])->name('add.volunteers');
+    Route::post('/volunteers', [PageController::class, 'store'])->name('volunteers.store');
     Route::put('/volunteer/{volunteer}/update-hours', [PageController::class, 'updateHours'])
         ->name('update.hours');
 
@@ -39,5 +45,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::post('/admin/toggle-register-access', [AdminController::class, 'toggleRegisterAccess'])->name('admin.toggleRegisterAccess');
+
+// Route::get('/register', function () {
+//     return view('auth.register');
+// })->middleware('check.register.access');
 
 require __DIR__ . '/auth.php';
