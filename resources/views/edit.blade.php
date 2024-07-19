@@ -15,21 +15,26 @@
                             <strong class="font-bold">Success!</strong>
                             <span class="block sm:inline">{{ session('success') }}</span>
                         </div>
-                    @endif 
+                    @endif
                     <form action="{{ route('dashboard.update', $volunteer->id) }}" method="POST">
                         @csrf
                         @method('PUT')
-                        <div class="shadow sm:rounded-md sm:overflow-hidden">
+                        <div class="  sm:rounded-md sm:overflow-hidden">
                             <div class="bg-dark py-6 px-4 space-y-6 sm:p-6">
                                 <div>
-                                    <h3 class="text-lg leading-6 font-medium text-gray-100">Volunteer Information</h3>
-                                    <p class="mt-1 text-sm text-gray-100">Use a permanent info where you can be
+                                    <h3
+                                        class="text-lg le ading-6 font-medium text-gray-800 dark:text-gray-200 leading-tighttext-gray-100">
+                                        Volunteer Information</h3>
+                                    <p
+                                        class="mt-1 text-sm text-gray-800 dark:text-gray-200 leading-tight  text-gray-100">
+                                        Use a permanent info where you can be
                                         reliable.</p>
                                 </div>
 
                                 <div class="grid grid-cols-6 gap-6">
                                     <div class="col-span-6 sm:col-span-3">
-                                        <label for="first-name" class="block text-sm font-medium text-gray-100">First
+                                        <label for="first-name"
+                                            class="block text-sm font-medium text-gray-800 dark:text-gray-200 leading-tight text-gray-100">First
                                             name</label>
                                         <input type="text" name="name" id="name"
                                             value="{{ $volunteer->name }}"
@@ -40,7 +45,8 @@
                                     </div>
 
                                     <div class="col-span-6 sm:col-span-3">
-                                        <label for="last-name" class="block text-sm font-medium text-gray-100">Project
+                                        <label for="last-name"
+                                            class="block text-sm font-medium text-gray-800 dark:text-gray-200 leading-tight text-gray-100">Project
                                             Title (If
                                             There is Any Project Done)</label>
                                         <input type="text" name="project_title" id="project_title"
@@ -50,7 +56,8 @@
 
                                     <div class="col-span-6 sm:col-span-4">
                                         <label for="email-address"
-                                            class="block text-sm font-medium text-gray-100">Description of the
+                                            class="block text-sm font-medium text-gray-800 dark:text-gray-200 leading-tight text-gray-100">Description
+                                            of the
                                             project</label>
                                         <input type="text" name="project_description" id="project_description"
                                             value="{{ $volunteer->project_description }}"
@@ -60,7 +67,8 @@
                             </div>
                             <div class="px-4 py-3 text-right sm:px-6">
                                 <button type="submit"
-                                    class="bg-indigo-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save Changes</button>
+                                    class="bg-indigo-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save
+                                    Changes</button>
                             </div>
                         </div>
                     </form>

@@ -14,7 +14,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/custom.css">
-    <link rel="shortcut icon" href="{{ asset('images/nexus.png') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{asset('images/Nexus.png')}}" type="image/x-icon">
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -43,22 +43,22 @@
         <div class="max-w-7xl mx-auto py-12 px-4 overflow-hidden sm:px-6 lg:px-8">
             <div class="mt-8 flex justify-center space-x-6"> 
 
-                <a target="_blank" href="https://wa.me/+251955133507" class="text-gray-400 hover:text-white">
-                    <span class="sr-only">WhatsApp</span>
+                <a target="_blank" href="https://wa.me/+251955133507" class="text-gray-400 hover:text-">
+                    <span class="text-gray-800 dark:text-gray-200 leading-tight sr-only">WhatsApp</span>
                     <i class="fa-brands fa-whatsapp"></i>
                 </a>
 
-                <a target="_blank" href="https://t.me/lalo_dev" class="text-gray-400 hover:text-white">
-                    <span class="sr-only">Telegram</span>
+                <a target="_blank" href="https://t.me/lalo_dev" class="text-gray-400 hover:text-">
+                    <span class="text-gray-800 dark:text-gray-200 leading-tight sr-only">Telegram</span>
                     <i class="fa-brands fa-telegram"></i>
                 </a>
 
-                <a target="_blank" href="https://instagram.com/lalo_dev_official" class="text-gray-400 hover:text-white">
-                    <span class="sr-only">Instagram</span>
+                <a target="_blank" href="https://instagram.com/lalo_dev_official" class="text-gray-400 hover:text-">
+                    <span class="text-gray-800 dark:text-gray-200 leading-tight sr-only">Instagram</span>
                     <i class="fa-brands fa-instagram"></i>
                 </a> 
             </div>
-            <p class="mt-8 text-center text-base text-white">&copy; 2024 <a href="http://lalodev.com">Lalo Dev</a>, Inc. All rights reserved.</p>
+            <p class=" text-gray-800 dark:text-gray-200 leading-tight mt-8 text-center text-base ">&copy; 2024 <a href="http://lalodev.com">Lalo Dev</a>, Inc. All rights reserved.</p>
         </div>
     </footer>
 </body>
