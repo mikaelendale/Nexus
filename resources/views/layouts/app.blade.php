@@ -61,7 +61,5 @@
             <p class="mt-8 text-center text-base text-white">&copy; 2024 <a href="http://lalodev.com">Lalo Dev</a>, Inc. All rights reserved.</p>
         </div>
     </footer>
-
 </body>
-
 </html>
