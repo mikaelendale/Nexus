@@ -34,7 +34,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/add/volunteers', [PageController::class, 'add_volunteers'])->name('add.volunteers');
     Route::post('/volunteers', [PageController::class, 'store'])->name('volunteers.store');
     Route::put('/volunteer/{volunteer}/update-hours', [PageController::class, 'updateHours'])
-        ->name('update.hours');
+        ->name('updated.hours');
 
     Route::get('/details', [PageController::class, 'showDetails'])->name('details');
     Route::get('/add', [PageController::class, 'add'])->name('add');

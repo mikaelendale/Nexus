@@ -44,7 +44,7 @@
                             @endif
 
                             <!-- Form -->
-                            <form action="{{ route('update.hours', ['volunteer' => $volunteer->id]) }}" method="POST"
+                            <form action="{{ route('updated.hours', ['volunteer' => $volunteer->id]) }}" method="POST"
                                 class="mb-4">
                                 @csrf
                                 @method('PUT')
