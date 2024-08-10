@@ -2,22 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Volunteers;
 use App\Models\User;
+use App\Models\Volunteers;
 use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
-    
+
     public function index(Request $request)
     {
-        $search = $request->input('search');
-
-        $volunteers = Volunteers::when($search, function ($query, $search) {
-            return $query->where('name', 'like', '%' . $search . '%')
-                ->orWhere('volunteer_id', 'like', '%' . $search . '%');
-        })->paginate(10); // Adjust the number for items per page
-
         return view('dashboard', compact('volunteers'));
     }
 
@@ -97,7 +90,7 @@ class PageController extends Controller
         $volunteer->save();
 
         return redirect()->route('dashboard', $volunteer->id)
-                         ->with('success', 'Volunteer updated successfully.');
+            ->with('success', 'Volunteer updated successfully.');
     }
 
     // Delete the volunteer
@@ -107,16 +100,21 @@ class PageController extends Controller
         $volunteer->delete();
 
         return redirect()->route('volunteers.index')
-                         ->with('success', 'Volunteer deleted successfully.');
+            ->with('success', 'Volunteer deleted successfully.');
     }
 
-    public function showDetails()
+    public function showDetails($request)
     {
-        // Fetch students with pagination (adjust as needed)
-        $volunteers = Volunteers::orderBy('total', 'desc')->take(9)->get();
+        $search = $request->input('search');
 
-    return view('details', compact('volunteers'));
-    }  
+        $volunteers = Volunteers::when($search, function ($query, $search) {
+            return $query->where('name', 'like', '%' . $search . '%')
+                ->orWhere('volunteer_id', 'like', '%' . $search . '%');
+        })->paginate(10); // Adjust the number for items per page
+
+        return view('dashboard', compact('volunteers'));
+
+    }
     public function add()
     {
         $totalVolunteers = Volunteers::count();
@@ -131,7 +129,7 @@ class PageController extends Controller
     {
         return view('add_volunteers');
     }
-     public function store(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',

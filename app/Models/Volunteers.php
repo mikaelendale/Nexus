@@ -7,23 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Volunteers extends Model
 {
+    // Specify the table name for this model
+    use HasFactory;
+    protected $table = 'volunteers';
     protected $fillable = [
-        'name', 'volunteer_id', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
-        'project_title', 'project_description', 'status',
-    ];
-
-    // Accessor for 'total' attribute
-    public function getTotalAttribute()
+        'name', 'volunteer_id', 
+    ]; 
+    public function orgs()
     {
-        $total = 0;
-        $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        return $this->belongsToMany(Org::class, 'volunteer_org', 'volunteer_id', 'org_id');
+    }
 
-        foreach ($days as $day) {
-            if ($this->{$day}) {
-                $total += (int) $this->{$day};
-            }
-        }
-
-        return $total;
+    public function projects()
+    {
+        return $this->hasMany(Projects::class, 'volunteer_id');
     }
 }
