@@ -8,7 +8,7 @@
     <!--  Title -->
     <title>Nexus | Lalo Dev</title>
     <!--  Favicon -->
-    <link rel="shortcut icon" type="image/Nexus.png" href="favicon.ico">
+    <link rel="shortcut icon" type="{{asset('image/Nexus.png')}}" href="favicon.ico">
     <!--  Aos -->
     <link rel="stylesheet" href="css/aos.css">
     <link rel="stylesheet" href="css/owl.carousel.min.css">
