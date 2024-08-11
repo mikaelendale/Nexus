@@ -18,8 +18,7 @@
                 </div>
             </div>
         </div>
-    @endif 
-
+    @endif
     {{-- Top Volunteers Section --}}
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -38,31 +37,48 @@
                                                 <th scope="col"
                                                     class="px-6 py-3 text-left text-xs font-medium  text-gray-800 dark:text-gray-200 leading-tight uppercase tracking-wider">
                                                     Volunteer Id</th>
+                                                <th scope="col"
+                                                    class="px-6 py-3 text-left text-xs font-medium  text-gray-800 dark:text-gray-200 leading-tight uppercase tracking-wider">
+                                                    Org</th>
                                                 <th scope="col" class="relative px-6 py-3"><span
                                                         class="sr-only">Edit</span></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($volunteers as $volunteer)
-                                                <tr class="bg-dark">
-                                                    <td
-                                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium  text-gray-800 dark:text-gray-200 leading-tight">
-                                                        {{ $volunteer->name }}</td>
-                                                    <td
-                                                        class="px-6 py-4 whitespace-nowrap text-sm  text-gray-800 dark:text-gray-200 leading-tight">
-                                                        {{ $volunteer->volunteer_id }}</td>
-                                                    <td
-                                                        class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                        <a href="{{ route('dashboard.show', $volunteer->id) }}"
-                                                            class="text-green-600 hover:text-green-700">Check</a>
-                                                    </td>
-                                                    <td
-                                                        class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                        <a href="{{ route('dashboard.edit', $volunteer->id) }}"
-                                                            class="text-yellow-600 hover:text-red-600">Edit
-                                                            Volunteer</a>
-                                                    </td>
-                                                </tr>
+                                                @foreach ($volunteer->orgs as $org)
+                                                    @if (Auth::user()->ambassador_of == $org->name)
+                                                        <tr class="bg-dark">
+                                                            <td
+                                                                class="px-6 py-4 whitespace-nowrap text-sm font-medium  text-gray-800 dark:text-gray-200 leading-tight">
+                                                                {{ $volunteer->name }}</td>
+                                                            <td
+                                                                class="px-6 py-4 whitespace-nowrap text-sm  text-gray-800 dark:text-gray-200 leading-tight">
+                                                                {{ $volunteer->volunteer_id }}</td>
+                                                            <td
+                                                                class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                                @foreach ($volunteer->orgs as $org)
+                                                                    {{ $org->name }}@if (!$loop->last)
+                                                                        ,
+                                                                    @endif
+                                                                @endforeach
+                                                            </td>
+                                                            <td
+                                                                class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                                <a href="{{ route('volunteers.show', $volunteer->id) }}"
+                                                                    class="text-green-600 hover:text-green-700">Check</a>
+                                                            </td>
+                                                            
+                                                            <td
+                                                                class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                                <a href="{{ route('dashboard.edit', $volunteer->id) }}"
+                                                                    class="text-yellow-600 hover:text-red-600">Edit
+                                                                    Volunteer</a>
+                                                            </td>
+
+                                                        </tr>
+                                                    @endif
+                                                @endforeach
                                             @endforeach
                                             @if ($volunteers->isEmpty())
                                                 <tr>

@@ -16,9 +16,8 @@ class Volunteers extends Model
     ]; 
     public function orgs()
     {
-        return $this->belongsToMany(Org::class, 'volunteer_org', 'volunteer_id', 'org_id');
+        return $this->belongsToMany(Org::class, 'volunteer_org', 'volunteers_id', 'org_id');
     }
-
     public function projects()
     {
         return $this->hasMany(Projects::class, 'volunteer_id');

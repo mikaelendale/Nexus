@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Org;
 use App\Models\User;
 use App\Models\Volunteers;
+use App\Models\Volunteer_org;
 use Illuminate\Http\Request;
 
 class PageController extends Controller
@@ -15,7 +17,7 @@ class PageController extends Controller
 
         $volunteers = Volunteers::when($search, function ($query, $search) {
             return $query->where('name', 'like', '%' . $search . '%')
-                ->orWhere('volunteer_id', 'like', '%' . $search . '%');
+                ->orWhere('volunteers_id', 'like', '%' . $search . '%');
         })->paginate(10); // Adjust the number for items per page
 
         return view('dashboard', compact('volunteers'));
@@ -23,56 +25,61 @@ class PageController extends Controller
 
     public function show($id)
     {
+        // Fetch the volunteer record
         $volunteer = Volunteers::findOrFail($id);
-        return view('show', compact('volunteer'));
+
+        // Aggregate total hours from the volunteer_org table
+        $totalHours = Volunteer_org::where('volunteers_id', $id)->sum('hours');
+
+        // Set the goal for the progress bar
+        $goal = 72;
+
+        // Fetch the organizations related to the volunteer
+        $orgs = Org::join('volunteer_org', 'org.id', '=', 'volunteer_org.org_id')
+            ->where('volunteer_org.volunteers_id', $id)
+            ->select('org.*', 'volunteer_org.hours')
+            ->get();
+
+        // Example of setting currentOrgId, if applicable
+        $currentOrgId = Org::join('volunteer_org', 'org.id', '=', 'volunteer_org.org_id')
+            ->where('volunteer_org.volunteers_id', $id)
+            ->pluck('org.id')
+            ->first(); // Or however you want to determine the current organization ID
+
+        return view('show', compact('volunteer', 'totalHours', 'goal', 'orgs', 'currentOrgId'));
     }
 
-    public function updateHours(Request $request, Volunteers $volunteer)
+    public function updateHours(Request $request, $id)
     {
         // Validate incoming request data
-        $request->validate([
-            'day' => 'required|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
-            'hours' => 'required|numeric|min:-30',
+        $validated = $request->validate([
+            'org_id' => 'required|exists:org,id',
+            'hours' => 'required|numeric|min:0',
         ]);
 
-        // Calculate current hours for the selected day
-        $currentHours = (int) $volunteer->{$request->input('day')} ?? 0;
+        // Find the existing volunteer
+        $volunteer = Volunteers::findOrFail($id);
 
-        // Calculate hours being added
-        $hoursToAdd = (int) $request->input('hours');
+        // Check if the volunteer is already associated with the organization
+        $volunteerOrg = Volunteer_org::where('volunteers_id', $id)
+            ->where('org_id', $validated['org_id'])
+            ->first();
 
-        // Calculate new total hours after addition
-        $newHours = $currentHours + $hoursToAdd;
-
-        // Calculate total hours across all days
-        $totalHours = 0;
-        foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as $day) {
-            if ($day == $request->input('day')) {
-                $totalHours += $newHours; // Add the new hours for the selected day
-            } else {
-                $totalHours += (int) $volunteer->{$day};
-            }
+        if ($volunteerOrg) {
+            // Increment the existing hours by the new value
+            $volunteerOrg->hours += $validated['hours'];
+            $volunteerOrg->save();
+        } else {
+            // Create a new record if it doesn't exist
+            Volunteer_org::create([
+                'volunteers_id' => $id,
+                'org_id' => $validated['org_id'],
+                'hours' => $validated['hours'],
+            ]);
         }
 
-        // Check if the new total hours exceed 72
-        if ($totalHours > 72) {
-            return redirect()->back()->withErrors(['hours' => 'Total hours cannot exceed 72.'])->withInput();
-        }
-
-        // Update the specific day's hours
-        $volunteer->{$request->input('day')} = $newHours;
-
-        // Update the total hours
-        $volunteer->total = $totalHours;
-
-        // Save the updated volunteer
-        $volunteer->save();
-
-        // Optionally, you can set a success message
-        $message = 'Hours for ' . ucfirst($request->input('day')) . ' updated successfully.';
-
-        // Redirect back with a success message
-        return redirect()->back()->with('success', $message);
+        return redirect()->route('volunteers.show', $id)
+            ->with('success', 'Hours updated successfully.');
     }
 
     public function edit($id)
@@ -112,7 +119,7 @@ class PageController extends Controller
 // volunteer detail
     public function showDetails()
     {
-        $volunteers = Volunteers::paginate(10); // Adjust the number for items per page
+        $volunteers = Volunteers::with('orgs')->paginate(10); // Adjust the number for items per page
 
         return view('details', compact('volunteers'));
 
@@ -137,13 +144,26 @@ class PageController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        // Create a new volunteer with the name and auto-increment volunteer_id
+        // Create a new volunteer with the name and auto-increment volunteers_id
         $volunteer = Volunteers::create([
             'name' => $request->name,
-            'volunteer_id' => Volunteers::max('id') + 1, // Assuming `id` is the auto-incrementing primary key
+            'volunteers_id' => Volunteers::max('id') + 1, // Assuming `id` is the auto-incrementing primary key
         ]);
 
         return redirect()->route('add')->with('success', 'Volunteer added successfully.')->with('volunteer', $volunteer);
     }
+    public function addOrg(Request $request, $id)
+    {
+        $volunteer = Volunteers::findOrFail($id);
 
+        // Validate the request
+        $request->validate([
+            'org_id' => 'required|exists:org,id',
+        ]);
+
+        // Attach the organization to the volunteer
+        $volunteer->orgs()->syncWithoutDetaching([$request->input('org_id')]);
+
+        return redirect()->route('volunteers.show', $id)->with('success', 'Organization added successfully.');
+    }
 }

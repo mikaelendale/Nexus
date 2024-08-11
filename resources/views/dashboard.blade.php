@@ -84,7 +84,7 @@
                                                         {{ $volunteer->volunteer_id }}</td>
                                                     <td
                                                         class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                        <a href="{{ route('dashboard.show', $volunteer->id) }}"
+                                                        <a href="{{ route('volunteers.show', $volunteer->id) }}"
                                                             class="text-green-600 hover:text-green-700">Check</a>
                                                     </td>
                                                     <td

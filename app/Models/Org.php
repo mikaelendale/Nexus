@@ -12,7 +12,7 @@ class Org extends Model
     protected $fillable = [ 'name', ];
     public function volunteers()
     {
-        return $this->belongsToMany(Volunteers::class, 'volunteer_org', 'org_id', 'volunteer_id');
+        return $this->belongsToMany(Volunteers::class, 'volunteer_org', 'org_id', 'volunteers_id');
     }
 
     public function projects()

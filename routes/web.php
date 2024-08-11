@@ -21,7 +21,7 @@ Route::get('/', function () {
 });
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [PageController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard/{id}', [PageController::class, 'show'])->name('dashboard.show');
+    Route::get('/dashboard/{id}', [PageController::class, 'show'])->name('volunteers.show');
     Route::get('/dashboard/{id}/edit', [PageController::class, 'edit'])->name('dashboard.edit');
     Route::put('/dashboard/{id}', [PageController::class, 'update'])->name('dashboard.update');
     Route::delete('/dashboard/{id}', [PageController::class, 'destroy'])->name('dashboard.destroy');
@@ -33,6 +33,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/details', [PageController::class, 'showDetails'])->name('details');
     Route::get('/add', [PageController::class, 'add'])->name('add');
+    Route::post('/volunteers/{volunteer}/add-org', [PageController::class, 'addOrg'])->name('volunteers.addOrg');
+
 });
 
 Route::middleware('auth')->group(function () {

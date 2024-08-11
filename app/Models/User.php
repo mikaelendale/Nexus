@@ -43,4 +43,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function volunteers()
+    {
+        return $this->hasMany(Volunteers::class, 'user_id'); // Assuming `user_id` is the foreign key in `volunteers` table
+    }
 }
