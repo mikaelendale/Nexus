@@ -18,39 +18,7 @@
                 </div>
             </div>
         </div>
-    @endif
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100"> 
-                    <div class="pb-5 sm:flex sm:items-center sm:justify-between">
-                        <h3 class="text-lg   font-medium text-gray-800 dark:text-gray-200 leading-tight">Volunteer List
-                        </h3>
-                        <div class="mt-3 sm:mt-0 sm:ml-4">
-                            <label for="mobile-search-candidate" class="sr-only">Search</label>
-                            <form action="{{ route('dashboard') }}" method="GET">
-                                <div class="flex rounded-md shadow-sm">
-                                    <div class="relative flex-grow focus-within:z-10">
-                                        <div
-                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        </div>
-                                        <input type="text" name="search" id="search"
-                                            value="{{ request('search') }}"
-                                            class="bg-dark focus:ring-indigo-500 bg-gray focus:border-indigo-500 block w-full rounded-none rounded-l-md "
-                                            placeholder="Search">
-                                    </div>
-                                    <button type="submit"
-                                        class="-ml-px relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-                                        <span class="ml-2">Enter</span>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    @endif 
 
     {{-- Top Volunteers Section --}}
     <div class="py-12">

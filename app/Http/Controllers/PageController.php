@@ -11,7 +11,13 @@ class PageController extends Controller
 
     public function index(Request $request)
     {
-        $volunteers = Volunteers::all();
+        $search = $request->input('search');
+
+        $volunteers = Volunteers::when($search, function ($query, $search) {
+            return $query->where('name', 'like', '%' . $search . '%')
+                ->orWhere('volunteer_id', 'like', '%' . $search . '%');
+        })->paginate(10); // Adjust the number for items per page
+
         return view('dashboard', compact('volunteers'));
     }
 
@@ -103,17 +109,12 @@ class PageController extends Controller
         return redirect()->route('volunteers.index')
             ->with('success', 'Volunteer deleted successfully.');
     }
-
-    public function showDetails($request)
+// volunteer detail
+    public function showDetails()
     {
-        $search = $request->input('search');
+        $volunteers = Volunteers::paginate(10); // Adjust the number for items per page
 
-        $volunteers = Volunteers::when($search, function ($query, $search) {
-            return $query->where('name', 'like', '%' . $search . '%')
-                ->orWhere('volunteer_id', 'like', '%' . $search . '%');
-        })->paginate(10); // Adjust the number for items per page
-
-        return view('dashboard', compact('volunteers'));
+        return view('details', compact('volunteers'));
 
     }
     public function add()

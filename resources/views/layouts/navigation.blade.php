@@ -16,7 +16,19 @@
                         {{ __('Welcome ') }}{{Auth::user()->name}}
                     </x-nav-link>
                     <x-nav-link :href="route('details')" :active="request()->routeIs('details')">
-                        {{ __('Volunteers') }}
+                        @if (Auth::user()->ambassador_of == 'Sele Enat Charitable Organization')
+                            {{ __('Selenat Volunteers') }}
+                        @endif
+                        @if (Auth::user()->ambassador_of == 'Nehemiah Autism center')
+                            {{ __('Nehemiah Volunteers') }}
+                        @endif
+                        @if (Auth::user()->ambassador_of == 'Red Cross')
+                            {{ __('Red Cross Volunteers') }}
+                        @endif
+                        @if (Auth::user()->ambassador_of == 'Mary Joy')
+                            {{ __('Mary Joy Volunteers') }}
+                        @endif
+                    
                     </x-nav-link>
                     <x-nav-link :href="route('add')" :active="request()->routeIs('add')">
                         {{ __('Add Section') }}
