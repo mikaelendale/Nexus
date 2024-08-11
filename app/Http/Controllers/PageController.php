@@ -11,6 +11,7 @@ class PageController extends Controller
 
     public function index(Request $request)
     {
+        $volunteers = Volunteers::all();
         return view('dashboard', compact('volunteers'));
     }
 
