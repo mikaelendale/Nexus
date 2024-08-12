@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Org;
 use App\Models\Projects;
 use App\Models\User;
 use App\Models\Volunteers;
@@ -26,24 +27,14 @@ class PageController extends Controller
     public function show($id)
     {
         $volunteer = Volunteers::findOrFail($id);
-        $assignedOrgs = Volunteer_org::where('volunteers_id', $id)
-            ->with('org')
-            ->get();
+        $orgs = Org::all(); // Fetch all organizations
+        $assignedOrgs = Volunteer_org::where('volunteers_id', $id)->get(); // Get all assigned organizations with hours
         $totalHours = $assignedOrgs->sum('hours');
         $goal = 72; // Example goal
 
-        // Check if the volunteer is part of the "Online Volunteer" organization
-        $onlineVolunteerOrg = $assignedOrgs->firstWhere('org.name', 'Online Volunteer');
-
-        $projects = [];
-        if ($onlineVolunteerOrg) {
-            // Fetch the projects for this online volunteer
-            $projects = Projects::where('volunteer_org_id', $onlineVolunteerOrg->id)->get();
-        }
-
-        return view('show', compact('volunteer', 'assignedOrgs', 'totalHours', 'goal', 'onlineVolunteerOrg', 'projects'));
+        return view('show', compact('volunteer', 'orgs', 'assignedOrgs', 'totalHours', 'goal'));
     }
-
+    // VolunteerController.php
     public function submitProject(Request $request, $id)
     {
         $validated = $request->validate([
@@ -51,22 +42,16 @@ class PageController extends Controller
             'project_description' => 'required|string',
         ]);
 
-        $volunteerOrg = Volunteer_org::findOrFail($id);
-
-        // Ensure the volunteer is part of the "Online Volunteer" organization
-        if ($volunteerOrg->organization->name !== 'Online Volunteer') {
-            return redirect()->back()->withErrors('This volunteer is not part of the Online Volunteer organization.');
-        }
-
         // Create a new project
         Projects::create([
-            'volunteer_id' => $volunteerOrg->id,
-            'name' => $validated['project_name'],
+            'volunteers_id' => $id,
+            'project_name' => $validated['project_name'],
             'description' => $validated['project_description'],
+            'org_id' => 5, // Online Volunteer org ID
         ]);
 
-        return redirect()->route('volunteers.show', $volunteerOrg->volunteers_id)
-            ->with('success', 'Project submitted successfully.');
+        return redirect()->route('volunteers.show', $id)
+            ->with('success', 'Project added successfully.');
     }
 
     public function updateHours(Request $request, $id)
