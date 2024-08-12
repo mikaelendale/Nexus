@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Org;
+use App\Models\Projects;
 use App\Models\User;
 use App\Models\Volunteers;
 use App\Models\Volunteer_org;
@@ -24,43 +24,98 @@ class PageController extends Controller
     }
 
     public function show($id)
-{
-    $volunteer = Volunteers::findOrFail($id);
-    $orgs = Org::all(); // Fetch all organizations
-    $assignedOrgs = Volunteer_org::where('volunteers_id', $id)->get(); // Get all assigned organizations with hours
-    $totalHours = $assignedOrgs->sum('hours');
-    $goal = 72; // Example goal
+    {
+        $volunteer = Volunteers::findOrFail($id);
+        $assignedOrgs = Volunteer_org::where('volunteers_id', $id)
+            ->with('org')
+            ->get();
+        $totalHours = $assignedOrgs->sum('hours');
+        $goal = 72; // Example goal
 
-    return view('volunteers.show', compact('volunteer', 'orgs', 'assignedOrgs', 'totalHours', 'goal'));
-}
+        // Check if the volunteer is part of the "Online Volunteer" organization
+        $onlineVolunteerOrg = $assignedOrgs->firstWhere('org.name', 'Online Volunteer');
 
+        $projects = [];
+        if ($onlineVolunteerOrg) {
+            // Fetch the projects for this online volunteer
+            $projects = Projects::where('volunteer_org_id', $onlineVolunteerOrg->id)->get();
+        }
+
+        return view('show', compact('volunteer', 'assignedOrgs', 'totalHours', 'goal', 'onlineVolunteerOrg', 'projects'));
+    }
+
+    public function submitProject(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'project_name' => 'required|string|max:255',
+            'project_description' => 'required|string',
+        ]);
+
+        $volunteerOrg = Volunteer_org::findOrFail($id);
+
+        // Ensure the volunteer is part of the "Online Volunteer" organization
+        if ($volunteerOrg->organization->name !== 'Online Volunteer') {
+            return redirect()->back()->withErrors('This volunteer is not part of the Online Volunteer organization.');
+        }
+
+        // Create a new project
+        Projects::create([
+            'volunteer_id' => $volunteerOrg->id,
+            'name' => $validated['project_name'],
+            'description' => $validated['project_description'],
+        ]);
+
+        return redirect()->route('volunteers.show', $volunteerOrg->volunteers_id)
+            ->with('success', 'Project submitted successfully.');
+    }
 
     public function updateHours(Request $request, $id)
     {
         // Validate incoming request data
         $validated = $request->validate([
-            'org_id' => 'required|exists:org,id', // Update here
+            'org_id' => 'required|exists:org,id',
             'hours' => 'required|numeric|min:0',
         ]);
 
         // Find the existing volunteer
         $volunteer = Volunteers::findOrFail($id);
 
-        // Check if the volunteer is already associated with the organization
+        // Find the current hours for the organization
         $volunteerOrg = Volunteer_org::where('volunteers_id', $id)
             ->where('org_id', $validated['org_id'])
             ->first();
 
+        // Cast hours to integer
+        $hoursToAdd = (int) $validated['hours'];
+
+        // Set the maximum hours limit
+        $maxHours = 72;
+
         if ($volunteerOrg) {
-            // Increment the existing hours by the new value
-            $volunteerOrg->hours += $validated['hours'];
+            // Calculate the new total hours for the organization
+            $newTotalHours = $volunteerOrg->hours + $hoursToAdd;
+
+            // Check if adding the hours would exceed the limit
+            if ($newTotalHours > $maxHours) {
+                return redirect()->route('volunteers.show', $id)
+                    ->withErrors(['hours' => 'The total hours for this organization cannot exceed ' . $maxHours . ' hours.']);
+            }
+
+            // Update the existing record
+            $volunteerOrg->hours = $newTotalHours;
             $volunteerOrg->save();
         } else {
+            // Check if the hours to add exceed the limit
+            if ($hoursToAdd > $maxHours) {
+                return redirect()->route('volunteers.show', $id)
+                    ->withErrors(['hours' => 'The total hours for this organization cannot exceed ' . $maxHours . ' hours.']);
+            }
+
             // Create a new record if it doesn't exist
             Volunteer_org::create([
                 'volunteers_id' => $id,
                 'org_id' => $validated['org_id'],
-                'hours' => $validated['hours'],
+                'hours' => $hoursToAdd,
             ]);
         }
 

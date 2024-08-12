@@ -12,7 +12,7 @@ class Volunteer_org extends Model
     protected $fillable = [
         'volunteer_id', 'org_id', 'hours',
     ];
-    
+
     public function volunteer()
     {
         return $this->belongsTo(Volunteers::class, 'volunteer_id');
@@ -22,4 +22,9 @@ class Volunteer_org extends Model
     {
         return $this->belongsTo(Org::class, 'org_id');
     }
+    public function projects()
+    {
+        return $this->hasMany(Projects::class);
+    }
+
 }

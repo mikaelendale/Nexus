@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Schema; 
 
 return new class extends Migration
 {
@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('volunteers_id')->constrained('volunteers')->onDelete('cascade');
+            $table->foreignId('volunteer_org_id')->constrained('volunteer_org')->onDelete('cascade');
             $table->foreignId('org_id')->constrained('org')->onDelete('cascade');
             $table->string('project_name');
             $table->text('description');
