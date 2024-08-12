@@ -24,36 +24,22 @@ class PageController extends Controller
     }
 
     public function show($id)
-    {
-        // Fetch the volunteer record
-        $volunteer = Volunteers::findOrFail($id);
+{
+    $volunteer = Volunteers::findOrFail($id);
+    $orgs = Org::all(); // Fetch all organizations
+    $assignedOrgs = Volunteer_org::where('volunteers_id', $id)->get(); // Get all assigned organizations with hours
+    $totalHours = $assignedOrgs->sum('hours');
+    $goal = 72; // Example goal
 
-        // Aggregate total hours from the volunteer_org table
-        $totalHours = Volunteer_org::where('volunteers_id', $id)->sum('hours');
+    return view('volunteers.show', compact('volunteer', 'orgs', 'assignedOrgs', 'totalHours', 'goal'));
+}
 
-        // Set the goal for the progress bar
-        $goal = 72;
-
-        // Fetch the organizations related to the volunteer
-        $orgs = Org::join('volunteer_org', 'org.id', '=', 'volunteer_org.org_id')
-            ->where('volunteer_org.volunteers_id', $id)
-            ->select('org.*', 'volunteer_org.hours')
-            ->get();
-
-        // Example of setting currentOrgId, if applicable
-        $currentOrgId = Org::join('volunteer_org', 'org.id', '=', 'volunteer_org.org_id')
-            ->where('volunteer_org.volunteers_id', $id)
-            ->pluck('org.id')
-            ->first(); // Or however you want to determine the current organization ID
-
-        return view('show', compact('volunteer', 'totalHours', 'goal', 'orgs', 'currentOrgId'));
-    }
 
     public function updateHours(Request $request, $id)
     {
         // Validate incoming request data
         $validated = $request->validate([
-            'org_id' => 'required|exists:org,id',
+            'org_id' => 'required|exists:org,id', // Update here
             'hours' => 'required|numeric|min:0',
         ]);
 

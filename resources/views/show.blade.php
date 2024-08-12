@@ -44,7 +44,6 @@
                             @endif
 
                             <!-- Form -->
-                            <!-- Example form for updating volunteer hours -->
                             <form action="{{ route('updated.hours', ['volunteer' => $volunteer->id]) }}" method="POST"
                                 class="mb-4">
                                 @csrf
@@ -52,13 +51,13 @@
 
                                 <!-- Organization Selection -->
                                 <div>
-                                    <label for="org"
+                                    <label for="org_id"
                                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Organization</label>
-                                    <select name="org" id="org"
+                                    <select name="org_id" id="org_id"
                                         class="mt-1 block w-full rounded-md bg-gray-100 dark:bg-gray-700 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                                         @foreach ($orgs as $org)
                                             <option value="{{ $org->id }}"
-                                                {{ $org->id == $currentOrgId ? 'selected' : '' }}>
+                                                {{ $org->id == Auth::user()->ambassador_of ? 'selected' : '' }}>
                                                 {{ $org->name }}
                                             </option>
                                         @endforeach
@@ -71,7 +70,8 @@
                                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Amount of
                                         Hours</label>
                                     <input type="number" name="hours" id="hours"
-                                        class="mt-1 block w-full rounded-md bg-gray-100 dark:bg-gray-700 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                        class="mt-1 block w-full rounded-md bg-gray-100 dark:bg-gray-700 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                        required>
                                 </div>
 
                                 <div class="mt-4 flex justify-end">
@@ -80,18 +80,12 @@
                                 </div><br>
                             </form>
 
-
-                            <!-- Display Organizations and Hours -->
-
-
                             <!-- Progress Bar Calculation -->
                             @php
                                 // Ensure default values
-                                $totalHours = $totalHours ?? 0; // Ensure totalHours is available
-                                $goal = $goal ?? 72; // Ensure goal is available
+                                $totalHours = $totalHours ?? 0;
+                                $goal = $goal ?? 72;
                                 $percentage = ($totalHours / $goal) * 100;
-
-                                // Initialize as empty array if null
                                 $assignedOrgs = $assignedOrgs ?? [];
                             @endphp
 
@@ -113,27 +107,26 @@
                             <!-- Organizations and Hours Worked -->
                             @if ($orgs->isNotEmpty())
                                 <h2 class="text-lg font-semibold mb-4">Organizations and Hours Worked:</h2>
-                                <div class="  overflow-hidden sm:rounded-lg">
+                                <div class="overflow-hidden sm:rounded-lg">
                                     <table class="min-w-full divide-y divide-gray-200">
                                         <thead class="bg-dark">
                                             <tr>
                                                 <th scope="col"
-                                                    class="px-6 py-3 text-left text-xs font-medium  text-gray-800 dark:text-gray-200 leading-tight uppercase tracking-wider">
+                                                    class="px-6 py-3 text-left text-xs font-medium text-gray-800 dark:text-gray-200 leading-tight uppercase tracking-wider">
                                                     Organization</th>
                                                 <th scope="col"
-                                                    class="px-6 py-3 text-left text-xs font-medium  text-gray-800 dark:text-gray-200 leading-tight uppercase tracking-wider">
+                                                    class="px-6 py-3 text-left text-xs font-medium text-gray-800 dark:text-gray-200 leading-tight uppercase tracking-wider">
                                                     Hours Worked</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-
                                             @foreach ($orgs as $org)
                                                 <tr class="bg-dark">
                                                     <td
-                                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium  text-gray-800 dark:text-gray-200 leading-tight">
+                                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-200 leading-tight">
                                                         {{ $org->name }}</td>
                                                     <td
-                                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium  text-gray-800 dark:text-gray-200 leading-tight">
+                                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-200 leading-tight">
                                                         {{ $org->hours }}</td>
                                                 </tr>
                                             @endforeach
@@ -155,11 +148,13 @@
                                     <select name="org_id" id="org_id"
                                         class="mt-1 block w-full rounded-md bg-gray-100 dark:bg-gray-700 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                                         @foreach ($orgs as $org)
-                                            @if (!in_array($org->id, $assignedOrgs))
-                                                <option value="{{ $org->id }}">{{ $org->name }}</option>
-                                            @endif
+                                            <option value="{{ $org->id }}"
+                                                {{ $org->id == Auth::user()->ambassador_of ? 'selected' : '' }}>
+                                                {{ $org->name }}
+                                            </option>
                                         @endforeach
                                     </select>
+
                                     <div class="mt-4 flex justify-end">
                                         <button type="submit"
                                             class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Add
@@ -167,18 +162,15 @@
                                     </div>
                                 </form>
                             @endif
-
                         </div>
+
                         <div class="mt-4 flex justify-between">
                             <a href="{{ route('dashboard') }}"
-                                class="py-4 px-2 text-indigo-600 hover:text-indigo-900">Go
-                                Back</a>
+                                class="py-4 px-2 text-indigo-600 hover:text-indigo-900">Go Back</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-
-
+    </div>
 </x-app-layout>
