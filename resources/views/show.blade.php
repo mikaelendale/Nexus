@@ -36,16 +36,33 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($projects as $project)
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                {{ $project->project_name }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {{ $project->description }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {{ $project->volunteerOrg->org->name }}</td>
-                                        </tr>
-                                    @endforeach
+                                    @forelse ($projects as $project)
+                                            <tr>
+                                                <td
+                                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                                                    {{ $project->project_name }}
+                                                </td>
+                                                <td
+                                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                                                    {{ $project->description }}
+                                                </td>
+                                                <td
+                                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                                                    {{ $project->org->name ?? 'N/A' }}
+                                                </td>
+                                                <td
+                                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                                                    {{ $project->created_at->format('M d, Y') }}
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="4"
+                                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200 text-center">
+                                                    No projects found for this volunteer.
+                                                </td>
+                                            </tr>
+                                        @endforelse
                                 </tbody>
                             </table>
 

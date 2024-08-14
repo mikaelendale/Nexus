@@ -14,11 +14,10 @@ class Projects extends Model
         'volunteers_id', 'project_name', 'description', 'org_id', 'volunteer_org_id',
     ];
 
-    public function org()
+   public function org()
     {
         return $this->belongsTo(Org::class, 'org_id');
     }
-
     public function volunteer()
     {
         return $this->belongsTo(Volunteers::class, 'volunteers_id');

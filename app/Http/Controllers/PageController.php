@@ -30,7 +30,7 @@ class PageController extends Controller
         $assignedOrgs = $volunteer->volunteerOrgs; // Get assigned organizations for the volunteer
 
         // Retrieve projects associated with the volunteer's organizations
-        $projects = Projects::whereIn('volunteer_org_id', $assignedOrgs->pluck('id'))->get();
+        $projects = Projects::where('volunteers_id', $volunteer->id)->get();
 
         // Existing code to retrieve organizations and hours
         $assignedOrgIds = Volunteer_org::where('volunteers_id', $id)->pluck('org_id')->toArray();
@@ -141,7 +141,7 @@ class PageController extends Controller
         $volunteer = Volunteers::findOrFail($id);
         $volunteer->delete();
 
-        return redirect()->route('volunteers.index')
+        return redirect()->route('details')
             ->with('success', 'Volunteer deleted successfully.');
     }
 // volunteer detail
