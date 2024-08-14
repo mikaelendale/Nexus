@@ -18,7 +18,7 @@ class PageController extends Controller
 
         $volunteers = Volunteers::when($search, function ($query, $search) {
             return $query->where('name', 'like', '%' . $search . '%')
-                ->orWhere('volunteers_id', 'like', '%' . $search . '%');
+                ->orWhere('volunteer_id', 'like', '%' . $search . '%');
         })->paginate(10); // Adjust the number for items per page
 
         return view('dashboard', compact('volunteers'));
@@ -27,13 +27,34 @@ class PageController extends Controller
     public function show($id)
     {
         $volunteer = Volunteers::findOrFail($id);
-        $orgs = Org::all(); // Fetch all organizations
-        $assignedOrgs = Volunteer_org::where('volunteers_id', $id)->get(); // Get all assigned organizations with hours
-        $totalHours = $assignedOrgs->sum('hours');
-        $goal = 72; // Example goal
+        $assignedOrgs = $volunteer->volunteerOrgs; // Get assigned organizations for the volunteer
 
-        return view('show', compact('volunteer', 'orgs', 'assignedOrgs', 'totalHours', 'goal'));
+        // Retrieve projects associated with the volunteer's organizations
+        $projects = Projects::whereIn('volunteer_org_id', $assignedOrgs->pluck('id'))->get();
+
+        // Existing code to retrieve organizations and hours
+        $assignedOrgIds = Volunteer_org::where('volunteers_id', $id)->pluck('org_id')->toArray();
+        $volunteerOrgs = Org::whereIn('id', $assignedOrgIds)->get();
+        $availableOrgs = Org::whereNotIn('id', $assignedOrgIds)->get();
+        $assignedOrgs = Volunteer_org::where('volunteers_id', $id)->get();
+        $totalHours = $assignedOrgs->sum('hours');
+        $goal = 72;
+
+        return view('show', compact('volunteer', 'volunteerOrgs', 'availableOrgs', 'assignedOrgs', 'totalHours', 'goal', 'projects'));
     }
+
+    public function removeOrg($volunteerId, $orgId)
+    {
+        // Find the volunteer organization entry
+        $volunteerOrg = Volunteer_org::where('volunteers_id', $volunteerId)->where('org_id', $orgId)->first();
+
+        if ($volunteerOrg) {
+            $volunteerOrg->delete();
+        }
+
+        return redirect()->back()->with('success', 'Organization removed successfully.');
+    }
+
     // VolunteerController.php
     public function submitProject(Request $request, $id)
     {
@@ -114,25 +135,6 @@ class PageController extends Controller
         return view('edit', compact('volunteer'));
     }
 
-    // Update the volunteer
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'project_title' => 'nullable|string|max:255',
-            'project_description' => 'nullable|string',
-        ]);
-
-        $volunteer = Volunteers::findOrFail($id);
-        $volunteer->name = $request->name;
-        $volunteer->project_title = $request->project_title;
-        $volunteer->project_description = $request->project_description;
-        $volunteer->save();
-
-        return redirect()->route('dashboard', $volunteer->id)
-            ->with('success', 'Volunteer updated successfully.');
-    }
-
     // Delete the volunteer
     public function destroy($id)
     {
@@ -173,7 +175,7 @@ class PageController extends Controller
         // Create a new volunteer with the name and auto-increment volunteers_id
         $volunteer = Volunteers::create([
             'name' => $request->name,
-            'volunteers_id' => Volunteers::max('id') + 1, // Assuming `id` is the auto-incrementing primary key
+            'volunteer_id' => Volunteers::max('id') + 1, // Assuming `id` is the auto-incrementing primary key
         ]);
 
         return redirect()->route('add')->with('success', 'Volunteer added successfully.')->with('volunteer', $volunteer);
@@ -181,11 +183,6 @@ class PageController extends Controller
     public function addOrg(Request $request, $id)
     {
         $volunteer = Volunteers::findOrFail($id);
-        $volunteer = Volunteers::findOrFail($id);
-        $orgs = Org::all(); // Fetch all organizations or as needed
-        $assignedOrgs = Volunteer_org::where('volunteers_id', $id)->pluck('org_id')->toArray();
-        $totalHours = Volunteer_org::where('volunteers_id', $id)->sum('hours');
-        $goal = 72; // Example goal
 
         // Validate the request
         $request->validate([
@@ -195,6 +192,6 @@ class PageController extends Controller
         // Attach the organization to the volunteer
         $volunteer->orgs()->syncWithoutDetaching([$request->input('org_id')]);
 
-        return redirect()->route('volunteers.show', $volunteer->id)->with(compact('volunteer', 'orgs', 'assignedOrgs', 'totalHours', 'goal'))->with('success', 'Organization added successfully.');
+        return redirect()->route('volunteers.show', $id)->with('success', 'Organization added successfully.');
     }
 }

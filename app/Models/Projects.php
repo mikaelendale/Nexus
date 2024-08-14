@@ -25,8 +25,9 @@ class Projects extends Model
     }
 
     public function volunteerOrg()
-    {
-        return $this->belongsTo(Volunteer_org::class, 'volunteer_org_id');
-    }
+{
+    return $this->belongsTo(Volunteer_org::class, 'volunteers_id');
+}
+
 }
 

@@ -22,4 +22,9 @@ class Volunteers extends Model
     {
         return $this->hasMany(Projects::class, 'volunteer_id');
     }
+    public function volunteerOrgs()
+{
+    return $this->hasMany(Volunteer_org::class, 'volunteers_id');
+}
+
 }

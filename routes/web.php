@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProjectsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +34,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/add', [PageController::class, 'add'])->name('add');
     Route::post('/volunteers/{volunteer}/add-org', [PageController::class, 'addOrg'])->name('volunteers.addOrg');
     Route::post('/volunteers/{id}/submitProject', [PageController::class, 'submitProject'])->name('volunteers.submitProject');
+    Route::delete('/volunteers/{volunteer}/orgs/{org}', [PageController::class, 'removeOrg'])
+    ->name('volunteers.removeOrg');
+    Route::post('/projects/store', [ProjectsController::class, 'store'])->name('projects.store');
 
 });
 

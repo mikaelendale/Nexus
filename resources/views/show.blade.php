@@ -17,7 +17,41 @@
                         <div>
                             <p><strong>Name:</strong> {{ $volunteer->name }}</p>
                             <p><strong>Volunteer ID:</strong> {{ $volunteer->volunteer_id }}</p>
+                            <!-- Existing Table for Organizations and Hours -->
+
+                            <!-- New Table for Volunteer Projects -->
+                            <h2 class="text-lg font-bold mt-8">Projects</h2>
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Project Name</th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Description</th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Organization</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($projects as $project)
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                {{ $project->project_name }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {{ $project->description }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {{ $project->volunteerOrg->org->name }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+
                         </div>
+
+
 
                         <!-- Form for Updating Volunteer Hours -->
                         <div>
@@ -41,6 +75,7 @@
                                 </div>
                             @endif
 
+                            <!-- This select is for updating hours for already associated organizations -->
                             <form action="{{ route('updated.hours', ['volunteer' => $volunteer->id]) }}" method="POST"
                                 class="mb-4">
                                 @csrf
@@ -52,7 +87,7 @@
                                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Organization</label>
                                     <select name="org_id" id="org_id"
                                         class="mt-1 block w-full rounded-md bg-gray-100 dark:bg-gray-700 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                        @foreach ($orgs as $org)
+                                        @foreach ($volunteerOrgs as $org)
                                             <option value="{{ $org->id }}">{{ $org->name }}</option>
                                         @endforeach
                                     </select>
@@ -72,6 +107,8 @@
                                         class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Submit</button>
                                 </div>
                             </form>
+
+
 
                             <!-- Organizations and Hours Worked -->
                             @if ($assignedOrgs->isNotEmpty())
@@ -95,12 +132,19 @@
                                                 <tbody>
                                                     @foreach ($assignedOrgs as $assignedOrg)
                                                         <tr class="bg-dark">
+                                                            <!-- Organization Name -->
                                                             <td
-                                                                class="px-6 py-4 whitespace-nowrap text-sm font-medium  text-gray-800 dark:text-gray-200 leading-tight">
-                                                                {{ $assignedOrg->org->name }}</td>
+                                                                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-200 leading-tight">
+                                                                {{ $assignedOrg->org->name }}
+                                                            </td>
+
+                                                            <!-- Hours -->
                                                             <td
-                                                                class="px-6 py-4 whitespace-nowrap text-sm  text-gray-800 dark:text-gray-200 leading-tight">
-                                                                {{ $assignedOrg->hours }}</td>
+                                                                class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200 leading-tight">
+                                                                {{ $assignedOrg->hours }}
+                                                            </td>
+
+                                                            <!-- Progress Bar -->
                                                             <td
                                                                 class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                                 @php
@@ -122,9 +166,26 @@
                                                                         completed</span>
                                                                 </div>
                                                             </td>
+
+                                                            <!-- Delete Button -->
+                                                            <td
+                                                                class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                                <form
+                                                                    action="{{ route('volunteers.removeOrg', ['volunteer' => $volunteer->id, 'org' => $assignedOrg->org->id]) }}"
+                                                                    method="POST"
+                                                                    onsubmit="return confirm('Are you sure you want to remove this organization?');">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit"
+                                                                        class="text-red-600 hover:text-red-900">
+                                                                        Delete
+                                                                    </button>
+                                                                </form>
+                                                            </td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
+
                                             </table>
                                         </div>
                                     </div>
@@ -134,6 +195,7 @@
                             @endif
 
                             <!-- Add Organization Form -->
+                            <!-- This select is for adding new organizations -->
                             <form action="{{ route('volunteers.addOrg', ['volunteer' => $volunteer->id]) }}"
                                 method="POST" class="mt-4">
                                 @csrf
@@ -142,11 +204,10 @@
                                     Organization</label>
                                 <select name="org_id" id="org_id"
                                     class="mt-1 block w-full rounded-md bg-gray-100 dark:bg-gray-700 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    @foreach ($orgs as $org) 
-                                            <option value="{{ $org->id }}">{{ $org->name }}</option> 
+                                    @foreach ($availableOrgs as $org)
+                                        <option value="{{ $org->id }}">{{ $org->name }}</option>
                                     @endforeach
                                 </select>
-
 
                                 <div class="mt-4 flex justify-end">
                                     <button type="submit"
@@ -154,60 +215,82 @@
                                         Organization</button>
                                 </div>
                             </form>
-                            @if ($assignedOrgs->where('org_id', 5)->isNotEmpty())
-                                <!-- Button to Open Modal -->
-                                <button id="openModal" class="px-4 py-2 bg-indigo-600 text-white rounded-md">Add
-                                    Project</button>
+                            <!-- Button to Open Modal -->
+                            <button id="openModal" class="px-4 py-2 bg-indigo-600 text-white rounded-md">Add
+                                Project</button>
 
-                                <!-- Modal Structure -->
-                                <div id="projectModal"
-                                    class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity hidden">
-                                    <div class="flex items-center justify-center h-full">
-                                        <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
-                                            <h3 class="text-lg leading-6 font-medium text-gray-900">Submit a Project
-                                            </h3>
-                                            <form
-                                                action="{{ route('volunteers.submitProject', ['id' => $volunteer->id]) }}"
-                                                method="POST">
-                                                @csrf
-                                                <div class="mt-4">
-                                                    <label for="project_name"
-                                                        class="block text-sm font-medium text-gray-700">Project
-                                                        Name</label>
-                                                    <input type="text" name="project_name" id="project_name"
-                                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                                        required>
-                                                </div>
-                                                <div class="mt-4">
-                                                    <label for="project_description"
-                                                        class="block text-sm font-medium text-gray-700">Project
-                                                        Description</label>
-                                                    <textarea name="project_description" id="project_description" rows="4"
-                                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                                        required></textarea>
-                                                </div>
-                                                <div class="mt-4 flex justify-end">
-                                                    <button type="button" id="closeModal"
-                                                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md">Cancel</button>
-                                                    <button type="submit"
-                                                        class="ml-4 px-4 py-2 bg-indigo-600 text-white rounded-md">Submit</button>
-                                                </div>
-                                            </form>
-                                        </div>
+                            <!-- Modal Structure -->
+                            <div id="projectModal"
+                                class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity hidden">
+                                <div class="flex items-center justify-center h-full">
+                                    <div class="bg-white dark:bg-gray-800  p-6 rounded-lg shadow-lg w-1/3">
+                                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
+                                            Submit a Project
+                                        </h3>
+                                        <form
+                                            action="{{ route('volunteers.submitProject', ['id' => $volunteer->id]) }}"
+                                            method="POST">
+                                            @csrf
+                                            <div class="mt-4">
+                                                <label for="project_name"
+                                                    class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                    Project Name
+                                                </label>
+                                                <input type="text" name="project_name" id="project_name"
+                                                    class="mt-1 block w-full rounded-md bg-white dark:bg-gray-800 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                                    required>
+                                            </div>
+
+                                            <div class="mt-4">
+                                                <label for="project_description"
+                                                    class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                    Project Description
+                                                </label>
+                                                <textarea name="project_description" id="project_description" rows="4"
+                                                    class="mt-1 block w-full rounded-md bg-white dark:bg-gray-800 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                                    required></textarea>
+                                            </div>
+
+                                            <!-- Add a select dropdown for the volunteer's organizations -->
+                                            <div class="mt-4">
+                                                <label for="org_id"
+                                                    class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                    Select Organization
+                                                </label>
+                                                <select name="org_id" id="org_id"
+                                                    class="mt-1 block w-full rounded-md bg-white dark:bg-gray-800 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                                    required>
+                                                    <option value="" disabled selected>Select an organization
+                                                    </option>
+                                                    @foreach ($volunteerOrgs as $org)
+                                                        <option value="{{ $org->id }}">{{ $org->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <div class="mt-4 flex justify-end">
+                                                <button type="button" id="closeModal"
+                                                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md">Cancel</button>
+                                                <button type="submit"
+                                                    class="ml-4 px-4 py-2 bg-indigo-600 text-white rounded-md">Submit</button>
+                                            </div>
+                                        </form>
+
                                     </div>
                                 </div>
+                            </div>
 
-                                <script>
-                                    // Script to handle modal visibility
-                                    document.getElementById('openModal').addEventListener('click', function() {
-                                        document.getElementById('projectModal').classList.remove('hidden');
-                                    });
+                            <script>
+                                // Script to handle modal visibility
+                                document.getElementById('openModal').addEventListener('click', function() {
+                                    document.getElementById('projectModal').classList.remove('hidden');
+                                });
 
-                                    document.getElementById('closeModal').addEventListener('click', function() {
-                                        document.getElementById('projectModal').classList.add('hidden');
-                                    });
-                                </script>
-                            @endif
+                                document.getElementById('closeModal').addEventListener('click', function() {
+                                    document.getElementById('projectModal').classList.add('hidden');
+                                });
+                            </script>
 
                         </div>
 

@@ -10,7 +10,7 @@ class Volunteer_org extends Model
     use HasFactory;
     protected $table = 'volunteer_org';
     protected $fillable = [
-        'volunteer_id', 'org_id', 'hours',
+        'volunteers_id', 'org_id', 'hours',
     ];
 
     public function volunteer()

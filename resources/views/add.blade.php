@@ -15,7 +15,7 @@
                             <strong class="font-bold">Success!</strong>
                             <span class="block sm:inline">{{ session('success') }}</span>
                             @if (session('volunteer'))
-                                <a href="{{ route('dashboard.show', session('volunteer')->id) }}"
+                                <a href="{{ route('volunteers.show', session('volunteer')->id) }}"
                                     class="underline text-blue-500">View Volunteer</a>
                             @endif
                         </div>
