@@ -142,12 +142,11 @@
                                     Organization</label>
                                 <select name="org_id" id="org_id"
                                     class="mt-1 block w-full rounded-md bg-gray-100 dark:bg-gray-700 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    @foreach ($orgs as $org)
-                                        @if (!in_array($org->id, $assignedOrgs->pluck('org_id')->toArray()))
-                                            <option value="{{ $org->id }}">{{ $org->name }}</option>
-                                        @endif
+                                    @foreach ($orgs as $org) 
+                                            <option value="{{ $org->id }}">{{ $org->name }}</option> 
                                     @endforeach
                                 </select>
+
 
                                 <div class="mt-4 flex justify-end">
                                     <button type="submit"

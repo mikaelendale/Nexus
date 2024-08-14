@@ -181,6 +181,11 @@ class PageController extends Controller
     public function addOrg(Request $request, $id)
     {
         $volunteer = Volunteers::findOrFail($id);
+        $volunteer = Volunteers::findOrFail($id);
+        $orgs = Org::all(); // Fetch all organizations or as needed
+        $assignedOrgs = Volunteer_org::where('volunteers_id', $id)->pluck('org_id')->toArray();
+        $totalHours = Volunteer_org::where('volunteers_id', $id)->sum('hours');
+        $goal = 72; // Example goal
 
         // Validate the request
         $request->validate([
@@ -190,6 +195,6 @@ class PageController extends Controller
         // Attach the organization to the volunteer
         $volunteer->orgs()->syncWithoutDetaching([$request->input('org_id')]);
 
-        return redirect()->route('volunteers.show', $id)->with('success', 'Organization added successfully.');
+        return redirect()->route('volunteers.show', $volunteer->id)->with(compact('volunteer', 'orgs', 'assignedOrgs', 'totalHours', 'goal'))->with('success', 'Organization added successfully.');
     }
 }
